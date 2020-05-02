@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "dmart-traduccion",
+  "private_key_id": "97a4644d517845a01f4f000de7d4970204c4d293",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDeBL8pF/eSqoLk\nxH66zIr+oVtFPUl72A46SQ40AM91ljHVFOWNmc0Of9Mvs+KWQA6mGsIV14iSzi0e\n92VA31cWfCQomM6/1MxXTc3IyY9xKrXAJhRvoDkcqwbmsVM97KSjddjg0QHUjb9b\nJYFaxjiZQj7SLxUkySa1iZjx4Q6+td5LKgRWWWp+hN4jSW/oJNqFVuJzqxhc4ZcO\nCXnvQzUcC2P/iBuVTC5JlPWmaL5Wlv69npE659lh2PdU1HmMTa999SEUiN8nT3wR\n0VxruEz/g1sVr4RXiy+2in6IZOSkLIXKBZI5F6RHO1y0gNkqQZRXRI3iBfqFgdH8\n4NLoX/NFAgMBAAECggEAANlYHRe/Os9rukxDC6lDEdNufJpUvuMtTop0PaSrFHYe\n3x6WMnzc7+WgJqTYqsfKWaNP9fPpsfrvDSHyow1zGPs/Y96ZKWpRWC4oY+BCtPP9\nycKLzKcpg9YBjsR096XP5NYXowMvxdnM2CTbtmyJsmnzlAEGnUT+dOsWAyZbXaOk\nFpCA9MG19k7QN4fu8UBUcUNt5LzgDHn2zXsK+6mxxWLqdXCzoSp8cEFBMpt+3xyw\nq0l8+fFKvT9zK/t1Jg4DnMmcSGrUe8+uv6lbMLOY+54/S4xbl3X6nvxVt/3yIQJD\nWtku4/wyikua4EnTO721h8MgL8elNR3KvbR0C7+ZPQKBgQDwmt42twLSFRUyik0W\ncXfTvxMQ1SHYlvsIFM7L+GLfZ5IIY7qMHaeama/ArXuPuZqbOe9kiI8iYrsGkQhA\noAABMJjmf0n6vSkW4888js//B+n6Fg4UCs7qBgXJ/8Br0pEJN289qs55fH9FUG3x\nfcaTleA5BDeFME0beI8D6NdiawKBgQDsOW531n+ie3YED9O0hzUk1MS+JdeaLudr\nnABNsG+nKZovklaQ6SlBTO1PkIKVTnTOxr6xn71KE9ZiPx0XUVYjlP7OlMoz9KJW\ncAwUHpbV/9c0ehSLhxOSI+uWHFlCh2idLqqPk5uoc6JcbHGDmT0KwfnqbFLjhVwk\nJrMNETVNDwKBgQCp1HazYjyQcycyNGKzS8ZL5RwdDoPEcNWiX6WUXa/UhzORzmsX\nibsLKh3fP9TunxDdLmimqql1mQDwYqDTlNxL+rSCRii+3pRJPuXBlgCEwF5MExM+\n3F4u269sZKS6trd/LOzNN2pkYBcpotrn0WLAO9M4C5zw2yYiFNfF561YHwKBgFTG\nx756XJQTeuc6RuAjJg9xzKnxKs9KxgL4maNIDsoPRCaOfkLDaurkkMZdNoAfCAyt\nhwJ4MZbER8w6mlYj+qYKcufwviCnSxt6WttdnwRuLO3IYlcwwvVPrtzQj7gwoHrI\npK2ia9qopTxGLvbrp9yUgPyAo77Dva27tcaaxmZBAoGANirUoWlxINr2lU8oAB7L\nmNmdlchhta2Msx8J1L08nIIG/7hOH8mdf7WgZP0qLJfsZS25+gwdxwCyu/Z/Vc6Q\nndjbZJaEN5Z1wXrm0CRi00xxmKHvmtH/i59k9uTEJt02Fm7QxnQp8bnTN7y8eo7m\n4LvQfrPm/IHBofRuCI/KDqg=\n-----END PRIVATE KEY-----\n",
+  "client_email": "service-acount-dmart-traduccio@dmart-traduccion.iam.gserviceaccount.com",
+  "client_id": "105906708091606702235",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/service-acount-dmart-traduccio%40dmart-traduccion.iam.gserviceaccount.com"
+}

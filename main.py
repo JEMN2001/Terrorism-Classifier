@@ -5,20 +5,19 @@ import math as mt
 ##########################################################################################
 ################################ Data import ###########################################
 ##########################################################################################
-
+'''
+Important: Before run this code, be secure that data have passed first filter
+'''
 def read_data(filename):
     data = pd.read_csv(filename, sep=',')
     return data
 
 per_to_val = 0.2 #Percantage of the data used for the validation
 #Wi first clean a little bit the tweets by removing the english translation label
-train = read_data('terrorism.csv') #terrorism.csv contains the ISIS related tweets 
+train = read_data('First_filter/terrorism_filtered.csv') #terrorism.csv contains the ISIS related tweets
 num_sample = len(train['tweets']) #num_sample represents the totla amunt of tweets this far
 #Wi first clean a little bit the tweets by removing the english translation label
 
-
-#Tha model will only care for the user, the tweet and the tag assosiated
-train = train.drop(['name','description','location','followers','numberstatuses','time'],axis=1)
 
 #Give this tweets the tag terrorism
 temp_tag = ['terrorist' for i in range(num_sample)]
@@ -26,11 +25,11 @@ train['tag'] = temp_tag
 
 data_train = mt.ceil(num_sample*(1-per_to_val))
 train, validate = train[:data_train], train[data_train:]
-#Now we add the Fanboys database
-tmp = read_data('IsisFanboy.csv')
 
-#Choose just the columns we are interested in
-tmp.drop(['name','tweetid','time'],inplace=True,axis=1)
+
+#Now we add the Fanboys database
+tmp = read_data('First_filter/IsisFanboy_filtered.csv')
+
 num_tmp = len(tmp['tweets'])
 temp_tag = ['fanboy' for i in range(num_tmp)]
 tmp['tag'] = temp_tag
@@ -41,10 +40,8 @@ train = pd.concat([train,tmp_train])
 validate = pd.concat([validate,tmp_validate])
 
 #Now we add the About ISIS database
-tmp = read_data('AboutIsis.csv')
+tmp = read_data('First_filter/AboutIsis_filtered.csv')
 
-#Choose just the columns we are interested in
-tmp.drop(['name','tweetid','time'],inplace=True,axis=1)
 num_tmp = len(tmp['tweets'])
 temp_tag = ['no terrorism' for i in range(num_tmp)]
 tmp['tag'] = temp_tag
@@ -85,7 +82,7 @@ STOPWORDS = set(stopwords.words('english'))
 def text_prepare(text):
     """
         text: a string
-        
+
         return: modified initial string in lowercase, with no URLs or unwanted symbols or english stopwords
     """
     text = text.replace("ENGLISH TRANSLATION: ","")
@@ -94,25 +91,10 @@ def text_prepare(text):
     text = re.sub(REMOVE_URLS, "", text)
     text = re.sub(REPLACE_BY_SPACE_RE," ",text)
     text = re.sub(BAD_SYMBOLS_RE,"",text)
-    #text = trans.translate(text,dest='en')
     text = text.split();
     return ' '.join([i for i in text if i not in STOPWORDS])
 
-# try:
-# 	twt = load('translated_tweets.txt')
-# except FileNotFoundError:
-# 	twt = []
-# num_tweets = len(tweets)
-# for i in range(len(twt),num_tweets):
-# 	try:
-# 		twt = text_prepare(tweets[i])
-# 		pause(4)
-# 	except JSONDecodeError:
-# 		save(twt,'translated_tweets.txt')
-# 		break
-# print(len(twt) == num_tweets)
 
-############################ Once the translation is fixed, change this line #################################
 tweets_train = [text_prepare(x) for x in tweets_train]
 tweets_val = [text_prepare(x) for x in tweets_val]
 ##############################################################################################################
@@ -120,6 +102,7 @@ print("All tweets were cleaned")
 ##############################################################################################################
 ################################### Implementation of BagOfWords Strategy ####################################
 ##############################################################################################################
+
 print("Implementing Bag of Words")
 from collections import defaultdict
 # Dictionary of all tags from train corpus with their counts.
@@ -147,15 +130,15 @@ def my_bag_of_words(text, words_to_index, dict_size):
     """
         text: a string
         dict_size: size of the dictionary
-        
+
         return a vector which is a bag-of-words representation of 'text'
     """
-    
+
     result_vector = np.zeros(dict_size)
     for word in text.split():
         if word in words_to_index:
             result_vector[words_to_index[word]] += 1
-    
+
     return result_vector
 
 from scipy import sparse as sp_sparse
@@ -174,11 +157,11 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 def tfidf_features(X_train, X_val):
     """
-        X_train, X_val, X_test — samples        
+        X_train, X_val, X_test — samples
         return TF-IDF vectorized representation of each sample and vocabulary
     """
     tfidf_vectorizer = TfidfVectorizer(min_df=5, max_df=0.9, ngram_range=(1, 2),
-                                       token_pattern='(\S+)')  
+                                       token_pattern='(\S+)')
     X_train=tfidf_vectorizer.fit_transform(X_train)
     X_val=tfidf_vectorizer.transform(X_val)
     return X_train, X_val, tfidf_vectorizer.vocabulary_
@@ -215,10 +198,10 @@ from sklearn.ensemble import AdaBoostClassifier
 def train_classifier(X_train, y_train, C=1.0, penalty='l2'):
     """
       X_train, y_train — training data
-      
+
       return: trained classifier
     """
-    
+
     lr = LogisticRegression(solver='newton-cg',C=C, penalty=penalty,n_jobs=-1)
     # lr.fit(X_train, y_train)
     ovr = OneVsRestClassifier(lr)
@@ -251,13 +234,13 @@ for i in range(12,16):
 
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
-from sklearn.metrics import roc_auc_score 
+from sklearn.metrics import roc_auc_score
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import recall_score
 
 
 def print_evaluation_scores(y_val, predicted):
-    
+
     print(accuracy_score(y_val, predicted))
     print(f1_score(y_val, predicted, average='weighted'))
     print(average_precision_score(y_val, predicted))
