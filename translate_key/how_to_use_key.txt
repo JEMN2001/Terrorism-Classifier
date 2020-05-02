@@ -1,8 +1,0 @@
-before running the translation code, write on cmd the following:
-
-set GOOGLE_APPLICATION_CREDENTIALS=[PATH_OF_PROJECT]\translate_key\dmart-traduccion-97a4644d5178.json
-
-#Put paht of the project without any type of quotes
-
-#Example:
-set GOOGLE_APPLICATION_CREDENTIALS=C:\Users\dmart\Desktop\pruba-terrorismo\translate_key\dmart-traduccion-97a4644d5178.json

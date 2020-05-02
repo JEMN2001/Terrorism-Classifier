@@ -86,18 +86,18 @@ Start filtering, just specify from what index tweet start, file name,
     and how many tweets want to filtering
 - If how_many_tweets is negative, all possible tweets will be filtered
 '''
-name_file = "Put database name to filter"
-from_tweet = "Above you can see what number tweet follows to filter by database"
+name_file = "AboutIsis.csv"
+from_tweet = "Put here index number of tweet start"
 how_many_tweets = -1
 filter = first_filter(name_file,from_tweet,how_many_tweets)
 print("{} characters translated\n{} translated tweets".format(filter[0],filter[1]))
 
 '''
-terrorism --> 17410 tweets_translated ---> 1,907,878 characters --->[Ready]
-AboutIsis --> 5602 tweets_translated --> 2,198,353 characters
-IsisFanboy --> 15936 tweets_translated ---> 3,156,069 characters --->[Ready]
+terrorism --> 17410 tweets_translated ---> [Ready]
+AboutIsis --> 23078 tweets_translated --> 7,743,217 characters
+IsisFanboy --> 15936 tweets_translated ---> [Ready]
 '''
 
 '''
-David api has translated 7,262,300 characters
+David api has translated 12,900,000 characters
 '''
