@@ -2,7 +2,7 @@ before running the translation code, write on cmd the following:
 
 set GOOGLE_APPLICATION_CREDENTIALS=[PATH_OF_KEY]\keyname
 
-#Put path of the project without any type of quotes
+#Put path of the project without any type of brackets
 
 #Example:
 set GOOGLE_APPLICATION_CREDENTIALS=C:\Users\dmart\Desktop\Terrorism-Classifier\translate_key\dmart-traduccion-44bb1fac7e82.json

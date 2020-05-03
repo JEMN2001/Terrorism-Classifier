@@ -6,17 +6,16 @@ import math as mt
 ################################ Data import ###########################################
 ##########################################################################################
 '''
-Important: Before run this code, be secure that data have passed first filter
+Important: Before run this code, be sure that data have passed first filter
 '''
 def read_data(filename):
     data = pd.read_csv(filename, sep=',')
     return data
 
 per_to_val = 0.2 #Percantage of the data used for the validation
-#Wi first clean a little bit the tweets by removing the english translation label
+
 train = read_data('First_filter/terrorism_filtered.csv') #terrorism.csv contains the ISIS related tweets
-num_sample = len(train['tweets']) #num_sample represents the totla amunt of tweets this far
-#Wi first clean a little bit the tweets by removing the english translation label
+num_sample = len(train['tweets']) #num_sample represents the total amount of tweets this far
 
 
 #Give this tweets the tag terrorism
@@ -68,16 +67,11 @@ nltk.download('stopwords')
 from nltk.corpus import stopwords
 
 import re
-#from googletrans import Translator
-#from json.decoder import JSONDecodeError
 
 REMOVE_URLS = re.compile('http\S+')
 REPLACE_BY_SPACE_RE = re.compile('[/(){}\[\]\|@,;]')
 BAD_SYMBOLS_RE = re.compile('[^0-9a-z +]')
 STOPWORDS = set(stopwords.words('english'))
-
-#translate_urls = ["translate.google.com", "translate.google.co.kr","translate.google.at", "translate.google.de","translate.google.ru", "translate.google.ch","translate.google.fr", "translate.google.es"]
-#trans = Translator(service_urls=translate_urls)
 
 def text_prepare(text):
     """
@@ -252,7 +246,6 @@ print('Tfidf')
 print_evaluation_scores(tags_val, tags_val_predicted_labels_tfidf)
 
 from metrics import roc_auc
-#matplotlib inline
 
 n_classes = len(tags_counts)
 roc_auc(tags_val, tags_val_predicted_scores_mybag, n_classes)
