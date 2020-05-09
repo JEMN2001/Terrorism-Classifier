@@ -63,17 +63,21 @@ tweets_train, tags_train = [str(x) for x in tweets_train], [str(x) for x in tags
 
 tweets_val, tags_val = validate['tweets'].values, validate['tag'].values
 tweets_val, tags_val = [str(x) for x in tweets_val], [str(x) for x in tags_val]
+tweets_display = tweets_val
 
 import nltk
 nltk.download('stopwords')
+nltk.download('wordnet')
 from nltk.corpus import stopwords
 
 import re
 
 REMOVE_URLS = re.compile('http\S+')
-REPLACE_BY_SPACE_RE = re.compile('[/(){}\[\]\|@,;]')
-BAD_SYMBOLS_RE = re.compile('[^0-9a-z +]')
+REPLACE_BY_SPACE_RE = re.compile('[/(){}\[\]\|,;&\n]')
+BAD_SYMBOLS_RE = re.compile('[^0-9a-z +\'@#]')
 STOPWORDS = set(stopwords.words('english'))
+tokenizer = nltk.tokenize.WhitespaceTokenizer()
+stemmer = nltk.stem.WordNetLemmatizer()
 
 def text_prepare(text):
     """
@@ -86,8 +90,8 @@ def text_prepare(text):
     text = re.sub(REMOVE_URLS, "", text)
     text = re.sub(REPLACE_BY_SPACE_RE," ",text)
     text = re.sub(BAD_SYMBOLS_RE,"",text)
-    text = text.split();
-    return ' '.join([i for i in text if i not in STOPWORDS])
+    text = tokenizer.tokenize(text);
+    return ' '.join([stemmer.lemmatize(i) for i in text if i not in STOPWORDS])
 
 
 tweets_train = [text_prepare(x) for x in tweets_train]
@@ -221,9 +225,10 @@ tags_val_predicted_scores_tfidf = classifier_tfidf.decision_function(tweets_val_
 
 tags_val_pred_inversed = mlb.inverse_transform(tags_val_predicted_labels_tfidf)
 tags_val_inversed = mlb.inverse_transform(tags_val)
-for i in range(12,16):
-    print('Title:\t{}\nTrue labels:\t{}\nPredicted labels:\t{}\n\n'.format(
+for i in range(1520,1524):
+    print('Title:\t{}\nWithout NLP:\t{}\nTrue labels:\t{}\nPredicted labels:\t{}\n\n'.format(
         tweets_val[i],
+        tweets_display[i],
         ','.join(tags_val_inversed[i]),
         ','.join(tags_val_pred_inversed[i])
     ))
@@ -255,3 +260,25 @@ roc_auc(tags_val, tags_val_predicted_scores_mybag, n_classes)
 
 n_classes = len(tags_counts)
 roc_auc(tags_val, tags_val_predicted_scores_tfidf, n_classes)
+
+def print_words_for_tag(classifier, tag, tags_classes, index_to_words, all_words):
+    """
+        classifier: trained classifier
+        tag: particular tag
+        tags_classes: a list of classes names from MultiLabelBinarizer
+        index_to_words: index_to_words transformation
+        all_words: all words in the dictionary
+        
+        return nothing, just print top 5 positive and top 5 negative words for current tag
+    """
+    print('Tag:\t{}'.format(tag))
+    est = classifier.estimators_[tags_classes.index(tag)]
+    top_positive_words = [index_to_words[index] for index in est.coef_.argsort().tolist()[0][-5:]]  # top-5 words sorted by the coefficiens.
+    top_negative_words = [index_to_words[index] for index in est.coef_.argsort().tolist()[0][:5]] # bottom-5 words  sorted by the coefficients.
+    print('Top positive words:\t{}'.format(', '.join(top_positive_words)))
+    print('Top negative words:\t{}\n'.format(', '.join(top_negative_words)))
+
+
+
+print_words_for_tag(classifier_tfidf, 'terrorism related', mlb.classes, tfidf_reversed_vocab, ALL_WORDS)
+print_words_for_tag(classifier_tfidf, 'no terrorist', mlb.classes, tfidf_reversed_vocab, ALL_WORDS)
