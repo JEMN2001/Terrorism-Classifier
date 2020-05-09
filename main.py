@@ -12,14 +12,14 @@ def read_data(filename):
     data = pd.read_csv(filename, sep=',')
     return data
 
-per_to_val = 0.2 #Percantage of the data used for the validation
+per_to_val = 0.1 #Percantage of the data used for the validation
 
 train = read_data('First_filter/terrorism_filtered.csv') #terrorism.csv contains the ISIS related tweets
 num_sample = len(train['tweets']) #num_sample represents the total amount of tweets this far
 
 
 #Give this tweets the tag terrorism
-temp_tag = ['terrorist' for i in range(num_sample)]
+temp_tag = ['terrorism related' for i in range(num_sample)]
 train['tag'] = temp_tag
 
 data_train = mt.ceil(num_sample*(1-per_to_val))
@@ -30,7 +30,7 @@ train, validate = train[:data_train], train[data_train:]
 tmp = read_data('First_filter/IsisFanboy_filtered.csv')
 
 num_tmp = len(tmp['tweets'])
-temp_tag = ['fanboy' for i in range(num_tmp)]
+temp_tag = ['terrorism related' for i in range(num_tmp)]
 tmp['tag'] = temp_tag
 
 data_train = mt.ceil(num_tmp*(1-per_to_val))
@@ -40,9 +40,10 @@ validate = pd.concat([validate,tmp_validate])
 
 #Now we add the About ISIS database
 tmp = read_data('First_filter/AboutIsis_filtered.csv')
+tmp = tmp[:len(train)+len(validate)]
 
 num_tmp = len(tmp['tweets'])
-temp_tag = ['no terrorism' for i in range(num_tmp)]
+temp_tag = ['no terrorist' for i in range(num_tmp)]
 tmp['tag'] = temp_tag
 
 data_train = mt.ceil(num_tmp*(1-per_to_val))
@@ -50,6 +51,7 @@ tmp_train, tmp_validate = tmp[:data_train], tmp[data_train:]
 train = pd.concat([train,tmp_train])
 validate = pd.concat([validate,tmp_validate])
 
+print('Number of tweets for train: ',len(train),'\nNumber of tweets for validate: ', len(validate))
 ##########################################################################################
 ################################ Data cleaning ###########################################
 ##########################################################################################
@@ -81,7 +83,6 @@ def text_prepare(text):
     """
     text = text.replace("ENGLISH TRANSLATION: ","")
     text = text.lower()
-    text = re.sub('rt ',"",text)
     text = re.sub(REMOVE_URLS, "", text)
     text = re.sub(REPLACE_BY_SPACE_RE," ",text)
     text = re.sub(BAD_SYMBOLS_RE,"",text)
@@ -113,6 +114,7 @@ for tweet in tweets_train:
 for tag in tags_train:
         tags_counts[tag] += 1
 
+print(tags_counts)
 
 most_common_words = sorted(words_counts.items(), key=lambda x: x[1], reverse=True)[:6000]
 DICT_SIZE = 5000

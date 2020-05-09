@@ -94,7 +94,7 @@ print("{} characters translated\n{} translated tweets".format(filter[0],filter[1
 
 '''
 terrorism --> 17410 tweets_translated ---> [Ready]
-AboutIsis --> 59820 tweets_translated --> 12662283 characters David: 7743211 Juanes: 4919072
+AboutIsis --> 59820 (son 120000 +-) tweets_translated --> 12662283 characters David: 7743211 Juanes: 4919072
 IsisFanboy --> 17391 tweets_translated ---> [Ready]
 '''
 
