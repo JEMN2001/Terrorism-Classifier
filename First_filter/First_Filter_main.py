@@ -1,6 +1,8 @@
 import pandas as pd
 import re
 
+
+column_tweets = 'text'
 REPLACE_BY_SPACE_RE = re.compile('[/(){}\[\]\|;]')
 REMOVE_URLS = re.compile('http\S+')
 emoji_pattern = re.compile("["
@@ -16,9 +18,9 @@ def read_data(filename):
 
 def remove_emoji(string):
 	string = string.replace("ENGLISH TRANSLATION: ", "")
+	string = re.sub(REMOVE_URLS,"",string)
 	string = re.sub(REPLACE_BY_SPACE_RE," ",string)
 	string = re.sub(re.compile('[?]'),"? ",string)
-	string = re.sub(REMOVE_URLS,"",string)
 	string = emoji_pattern.sub(r'',string)
 	string = re.sub('rt ',"",string)
 	return string
@@ -34,7 +36,7 @@ def first_filter(data_name,start_index,how_many_tweets):
 	train = read_data(data_name)
 	print("File {} opened Succesfully".format(data_name))
 	#removes all non-tweets columns
-	train = train.drop([i for i in train.columns if i!='tweets'],axis=1)
+	train = train.drop([i for i in train.columns if i!=column_tweets],axis=1)
 
 	#import google-cloud translator
 	from google.cloud import translate_v2
@@ -45,13 +47,13 @@ def first_filter(data_name,start_index,how_many_tweets):
 	#print(train['tweets'][from_tweet])
 	#print(tr.translate(train['tweets'][from_tweet])['translatedText'])
 	#remove emojis and substring
-	for i in range(start_index,len(train['tweets'])):
+	for i in range(start_index,len(train[column_tweets])):
 
 		try:
 		    #remove emojis
-			train['tweets'][i] = remove_emoji(train['tweets'][i])
+			train[column_tweets][i] = remove_emoji(train[column_tweets][i])
 		except:
-			print("Error con el tweet {}, tweet -> {}".format(i,train['tweets'][i]))
+			print("Error con el tweet {}, tweet -> {}".format(i,train[column_tweets][i]))
 			if(start_index > 0):
 				train.to_csv(data_name,index=False)
 			else:
@@ -61,9 +63,9 @@ def first_filter(data_name,start_index,how_many_tweets):
 
 		#Translate tweet, if something happens, database is saved with progress made
 		try:
-			train['tweets'][i] = tr.translate(train['tweets'][i])['translatedText']
+			train[column_tweets][i] = tr.translate(train[column_tweets][i])['translatedText']
 		except:
-			print("Error al traducir el tweet {}, tweet -> {}".format(i,train['tweets'][i]))
+			print("Error al traducir el tweet {}, tweet -> {}".format(i,train[column_tweets][i]))
 			if(start_index > 0):
 				train.to_csv(data_name,index=False)
 			else:
@@ -71,7 +73,7 @@ def first_filter(data_name,start_index,how_many_tweets):
 			return [character_count,translated_tweets]
 
 		translated_tweets += 1
-		character_count += len(train['tweets'][i])
+		character_count += len(train[column_tweets][i])
 		if (how_many_tweets == translated_tweets and how_many_tweets > 0 ): break
 
 	if(start_index > 0):
@@ -86,16 +88,18 @@ Start filtering, just specify from what index tweet start, file name,
 and how many tweets want to filtering
 - If how_many_tweets is negative, all possible tweets will be filtered
 '''
-name_file = "AboutIsis.csv"
-from_tweet = "Insert hero the current tweet"
+name_file = "Gathered_tweets.csv"
+from_tweet = 0
 how_many_tweets = -1
 filter = first_filter(name_file,from_tweet,how_many_tweets)
 print("{} characters translated\n{} translated tweets".format(filter[0],filter[1]))
 
 '''
 terrorism --> 17410 tweets_translated ---> [Ready]
-AboutIsis --> 59820 (son 120000 +-) tweets_translated --> 12662283 characters David: 7743211 Juanes: 4919072
+AboutIsis --> 59820 (there are 120000 +-) tweets_translated --> 12662283 characters David: 7743211 Juanes: 4919072
 IsisFanboy --> 17391 tweets_translated ---> [Ready]
+
+Gathered_tweets --> 130 tweets_translated 61237 characters Juan ---> [Ready]
 '''
 
 # Current tweet: 59820

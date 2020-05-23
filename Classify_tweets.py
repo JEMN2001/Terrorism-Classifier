@@ -13,53 +13,20 @@ def read_data(filename):
     data = pd.read_csv(filename, sep=',')
     return data
 
-per_to_val = 0.1 #Percantage of the data used for the validation
-
-train = read_data('First_filter/terrorism_filtered.csv') #terrorism.csv contains the ISIS related tweets
-num_sample = len(train['tweets']) #num_sample represents the total amount of tweets this far
+col_tweets = 'text'
+sample = read_data('First_filter/Gathered_tweets_filtered.csv') #terrorism.csv contains the ISIS related tweets
 
 
-#Give this tweets the tag terrorism
-temp_tag = ['terrorism related' for i in range(num_sample)]
-train['tag'] = temp_tag
-
-data_train = mt.ceil(num_sample*(1-per_to_val))
-len_train = data_train
-validate = train[data_train:]
-
-#Now we add the Fanboys database
-tmp = read_data('First_filter/IsisFanboy_filtered.csv')
-
-num_tmp = len(tmp['tweets'])
-temp_tag = ['terrorism related' for i in range(num_tmp)]
-tmp['tag'] = temp_tag
-
-data_train = mt.ceil(num_tmp*(1-per_to_val))
-len_train += data_train
-tmp_validate = tmp[data_train:]
-validate = pd.concat([validate,tmp_validate])
-#Now we add the About ISIS database
-tmp = read_data('First_filter/AboutIsis_filtered.csv')
-tmp = tmp[:len_train+len(validate)]
-
-num_tmp = len(tmp['tweets'])
-temp_tag = ['no terrorist' for i in range(num_tmp)]
-tmp['tag'] = temp_tag
-
-data_train = mt.ceil(num_tmp*(1-per_to_val))
-tmp_validate = tmp[data_train:]
-validate = pd.concat([validate,tmp_validate])
-
-print('Number of tweets for train: ',len(train),'\nNumber of tweets for validate: ', len(validate))
+print('Number of tweets to categorize: ',len(sample))
 ##########################################################################################
 ################################ Data cleaning ###########################################
 ##########################################################################################
 
 print("Cleaning the data")
 
-tweets_val, tags_val = validate['tweets'].values, validate['tag'].values
-tweets_val, tags_val = [str(x) for x in tweets_val], [str(x) for x in tags_val]
-tweets_display = tweets_val
+tweets = sample[col_tweets].values
+tweets = [str(x) for x in tweets]
+tweets_display = tweets
 
 import nltk
 nltk.download('stopwords')
@@ -90,7 +57,7 @@ def text_prepare(text):
     return ' '.join([stemmer.lemmatize(i) for i in text if i not in STOPWORDS])
 
 
-tweets_val = [text_prepare(x) for x in tweets_val]
+tweets = [text_prepare(x) for x in tweets]
 ##############################################################################################################
 print("All tweets were cleaned")
 ##############################################################################################################
@@ -99,18 +66,13 @@ print("All tweets were cleaned")
 
 print("Implementing Bag of Words")
 from collections import defaultdict
-# Dictionary of all tags from train corpus with their counts.
-tags_counts =  defaultdict(int)
 # Dictionary of all words from train corpus with their counts.
 words_counts =  defaultdict(int)
 
-for tweet in tweets_val:
+for tweet in tweets:
     for word in tweet.split():
         words_counts[word] += 1
 
-
-for tag in tags_val:
-        tags_counts[tag] += 1
 
 most_common_words = load("Trained_Model/BagOfWords.joblib")
 DICT_SIZE = 5000
@@ -135,8 +97,8 @@ def my_bag_of_words(text, words_to_index, dict_size):
 
 from scipy import sparse as sp_sparse
 
-tweets_val_mybag = sp_sparse.vstack([sp_sparse.csr_matrix(my_bag_of_words(text, WORDS_TO_INDEX, DICT_SIZE)) for text in tweets_val])
-print('tweets_val shape ', tweets_val_mybag.shape)
+tweets_mybag = sp_sparse.vstack([sp_sparse.csr_matrix(my_bag_of_words(text, WORDS_TO_INDEX, DICT_SIZE)) for text in tweets])
+print('tweets shape ', tweets_mybag.shape)
 print("My bag of Words transformation done!")
 
 ##############################################################################################################
@@ -154,7 +116,7 @@ def tfidf_features(X_val):
     X_val=tfidf_vectorizer.transform(X_val)
     return X_val, tfidf_vectorizer.vocabulary_
 
-tweets_val_tfidf, tfidf_vocab = tfidf_features(tweets_val)
+tweets_tfidf, tfidf_vocab = tfidf_features(tweets)
 tfidf_reversed_vocab = {i:word for word,i in tfidf_vocab.items()}
 print("TFIDF transformation done!")
 
@@ -165,12 +127,11 @@ print("Doing the MultiLabelBinarizer")
 from sklearn.preprocessing import MultiLabelBinarizer
 
 mlb = load("Trained_Model/MultiLabelBinarizer.joblib")
-tags_val = mlb.fit_transform([[tag] for tag in tags_val])
 
 print("The MultiLabelBinarizer is done!")
 
 ##############################################################################################################
-########################################## Upload Training the model ################################################
+########################################## Upload Training the model #########################################
 ##############################################################################################################
 print("Uploading Trained model")
 
@@ -179,69 +140,23 @@ classifier_tfidf = load('Trained_Model/Tfidf_model.joblib')
 
 print("Both models are Uploaded")
 
-tags_val_predicted_labels_mybag = classifier_mybag.predict(tweets_val_mybag)
-tags_val_predicted_scores_mybag = classifier_mybag.decision_function(tweets_val_mybag)
+tags_predicted_labels_mybag = classifier_mybag.predict(tweets_mybag)
+tags_predicted_scores_mybag = classifier_mybag.decision_function(tweets_mybag)
 
-tags_val_predicted_labels_tfidf = classifier_tfidf.predict(tweets_val_tfidf)
-tags_val_predicted_scores_tfidf = classifier_tfidf.decision_function(tweets_val_tfidf)
+tags_predicted_labels_tfidf = classifier_tfidf.predict(tweets_tfidf)
+tags_predicted_scores_tfidf = classifier_tfidf.decision_function(tweets_tfidf)
 
-tags_val_pred_inversed = mlb.inverse_transform(tags_val_predicted_labels_tfidf)
-tags_val_inversed = mlb.inverse_transform(tags_val)
-for i in range(1520,1524):
-    print('Title:\t{}\nWithout NLP:\t{}\nTrue labels:\t{}\nPredicted labels:\t{}\n\n'.format(
-        tweets_val[i],
+tags_pred_inversed = mlb.inverse_transform(tags_predicted_labels_tfidf)
+for i in range(95,100):
+    print('Title:\t{}\nWithout NLP:\t{}\nPredicted labels:\t{}\n\n'.format(
+        tweets[i],
         tweets_display[i],
-        ','.join(tags_val_inversed[i]),
-        ','.join(tags_val_pred_inversed[i])
+        ','.join(tags_pred_inversed[i])
     ))
 
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import f1_score
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import recall_score
-
-
-def print_evaluation_scores(y_val, predicted):
-
-    print(accuracy_score(y_val, predicted))
-    print(f1_score(y_val, predicted, average='weighted'))
-    print(average_precision_score(y_val, predicted))
-
-
-print('Bag-of-words')
-print_evaluation_scores(tags_val, tags_val_predicted_labels_mybag)
-print('Tfidf')
-print_evaluation_scores(tags_val, tags_val_predicted_labels_tfidf)
-
-from metrics import roc_auc
-
-n_classes = len(tags_counts)
-print(n_classes)
-roc_auc(tags_val, tags_val_predicted_scores_mybag, n_classes)
-
-
-n_classes = len(tags_counts)
-roc_auc(tags_val, tags_val_predicted_scores_tfidf, n_classes)
-
-def print_words_for_tag(classifier, tag, tags_classes, index_to_words, all_words):
-    """
-        classifier: trained classifier
-        tag: particular tag
-        tags_classes: a list of classes names from MultiLabelBinarizer
-        index_to_words: index_to_words transformation
-        all_words: all words in the dictionary
-
-        return nothing, just print top 5 positive and top 5 negative words for current tag
-    """
-    print('Tag:\t{}'.format(tag))
-    est = classifier.estimators_[tags_classes.index(tag)]
-    top_positive_words = [index_to_words[index] for index in est.coef_.argsort().tolist()[0][-10:]]  # top-5 words sorted by the coefficiens.
-    top_negative_words = [index_to_words[index] for index in est.coef_.argsort().tolist()[0][:10]] # bottom-5 words  sorted by the coefficients.
-    print('Top positive words:\t{}'.format(', '.join(top_positive_words)))
-    print('Top negative words:\t{}\n'.format(', '.join(top_negative_words)))
-
-
-
-print_words_for_tag(classifier_tfidf, 'terrorism related', mlb.classes, tfidf_reversed_vocab, ALL_WORDS)
-print_words_for_tag(classifier_tfidf, 'no terrorist', mlb.classes, tfidf_reversed_vocab, ALL_WORDS)
+##############################################################################################################
+########################################## Save the predictions ##############################################
+##############################################################################################################
+sample['text'] = tweets_display
+sample['tag'] = [''.join(tags_pred_inversed[i]) for i in range(len(tweets_display))]
+sample.to_csv('Classified_tweets.csv',index=False)
