@@ -203,10 +203,14 @@ from sklearn.metrics import recall_score
 
 
 def print_evaluation_scores(y_val, predicted):
-
-    print(accuracy_score(y_val, predicted))
-    print(f1_score(y_val, predicted, average='weighted'))
-    print(average_precision_score(y_val, predicted))
+    acc = accuracy_score(y_val, predicted)
+    f1 = f1_score(y_val, predicted, average='weighted')
+    pre = average_precision_score(y_val, predicted)
+    rec = (f1*pre)/(2*pre-f1)
+    print('accuracy: ', acc)
+    print('f1: ', f1)
+    print('precision: ', pre)
+    print('recall: ', rec)
 
 
 print('Bag-of-words')
