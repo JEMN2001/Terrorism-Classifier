@@ -64,6 +64,9 @@ tweets_val, tags_val = validate['tweets'].values, validate['tag'].values
 tweets_val, tags_val = [str(x) for x in tweets_val], [str(x) for x in tags_val]
 tweets_display = tweets_val
 
+pd.DataFrame(tweets_display,columns=['text']).to_csv('First_filter/Validation_tweets.csv',index=False)
+print('Validation Set Successfully Saved')
+
 import nltk
 nltk.download('stopwords')
 nltk.download('wordnet')

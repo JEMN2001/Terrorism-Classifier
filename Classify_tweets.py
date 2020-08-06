@@ -7,14 +7,15 @@ from joblib import load
 ################################ Data import ###########################################
 ##########################################################################################
 '''
-Important: Before run this code, be sure that data have passed first filter
+Important: Before run this code, be sure that data have passed first filter and Model is ready to predict
 '''
 def read_data(filename):
     data = pd.read_csv(filename, sep=',')
     return data
 
+file_name = 'Validation_tweets'
 col_tweets = 'text'
-sample = read_data('First_filter/Gathered_tweets_filtered.csv') #terrorism.csv contains the ISIS related tweets
+sample = read_data('First_filter/'+file_name+'.csv') #terrorism.csv contains the ISIS related tweets
 
 
 print('Number of tweets to categorize: ',len(sample))
@@ -159,4 +160,4 @@ for i in range(95,100):
 ##############################################################################################################
 sample['text'] = tweets_display
 sample['tag'] = [''.join(tags_pred_inversed[i]) for i in range(len(tweets_display))]
-sample.to_csv('Classified_tweets.csv',index=False)
+sample.to_csv('Classified_'+file_name+'.csv',index=False)
